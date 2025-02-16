@@ -1,18 +1,19 @@
 {
   "name": "mineboty",
   "version": "4.0.0",
-  "description": "minecraft practice pvp",
+  "description": "afk bot for minecraft server",
   "main": "index.js",
-    "engines": {
-    "node": "14.x"
+  "engines": {
+    "node": ">=18"
   },
-    "scripts": {
-        "test": "node index.js",
-        "start": "node .",
-        "mineboty .": "node ."
-    },
- 
-"dependencies": {
-    "mineboty": "^4.0.0"
-    }
+  "scripts": {
+    "test": "node index.js",
+    "start": "node .",
+    "mineboty .": "node ."
+  },
+  "dependencies": {
+    "mineboty": "^4.0.0",
+    "mineflayer": "^4.3.0",
+    "mineflayer-pathfinder": "^2.1.1"
+  }
 }
