@@ -6,7 +6,7 @@ function createBot() {
         host: config.server.ip,
         port: config.server.port,
         username: config["bot-account"].username,
-        password: config["bot-account"].password || undefined
+        password: config["bot-account"].password.trim() ? config["bot-account"].password : undefined
     });
 
     bot.on('login', () => {
@@ -22,12 +22,12 @@ function createBot() {
         }
 
         // Start Anti-AFK if enabled
-        if (config.utils["anti-afk"].enabled) {
+        if (config.utils["anti-afk"].enabled && config.utils["stay-afk"]) {
             startAntiAFK(bot);
         }
 
         // Start Auto Chat Messages if enabled
-        if (config.utils["chat-messages"].enabled) {
+        if (config.utils["chat-messages"].enabled && config.utils["chat-messages"].repeat) {
             startAutoChat(bot);
         }
     });
@@ -41,7 +41,7 @@ function createBot() {
         }
 
         // Admin Commands
-        if (config.utils["list-admin"].adminUsers.includes(username)) {
+        if (config.utils["list-admin"].enabled && config.utils["list-admin"].adminUsers.includes(username)) {
             if (message === "!jump") {
                 bot.chat("Jumping!");
                 bot.setControlState('jump', true);
@@ -68,12 +68,18 @@ function createBot() {
 
     bot.on('error', (err) => {
         console.error('[BOT] Error:', err);
+        if (config.utils["auto-reconnect"].enabled) {
+            console.log(`[BOT] Reconnecting in ${config.utils["auto-reconnect"].delay} seconds...`);
+            setTimeout(createBot, config.utils["auto-reconnect"].delay * 1000);
+        }
     });
 }
 
 // **Anti-AFK Movement**
 let afkInterval;
 function startAntiAFK(bot) {
+    if (!config.utils["stay-afk"]) return;
+
     afkInterval = setInterval(() => {
         const actions = ['jump', 'sneak', 'forward', 'back', 'left', 'right'];
         const randomAction = actions[Math.floor(Math.random() * actions.length)];
@@ -94,7 +100,7 @@ function stopAntiAFK(bot) {
 
 // **Auto Chat Messages**
 function startAutoChat(bot) {
-    if (!config.utils["chat-messages"].enabled) return; // Stop if disabled
+    if (!config.utils["chat-messages"].enabled || !config.utils["chat-messages"].repeat) return;
 
     let index = 0;
     setInterval(() => {
