@@ -3,40 +3,105 @@ const config = require('./config.json');
 
 function createBot() {
     const bot = mineflayer.createBot({
-        host: config.server,
-        port: config.port,
-        username: config.username,
-        password: config.password || undefined,
+        host: config.server.ip,
+        port: config.server.port,
+        username: config["bot-account"].username,
+        password: config["bot-account"].password || undefined
     });
 
     bot.on('login', () => {
-        console.log(`${bot.username} has joined the server.`);
+        console.log(`[BOT] ${bot.username} connected to ${config.server.ip}`);
     });
 
     bot.on('spawn', () => {
-        console.log(`${bot.username} is now in the game.`);
+        console.log(`[BOT] Spawned in the server.`);
 
-        // Prevent kicking by sending movements
-        if (config.stayAFK) {
-            setInterval(() => {
+        // Auto Login for AuthMe servers
+        if (config.utils["auto-auth"].enabled && config.utils["auto-auth"].password) {
+            bot.chat(`/login ${config.utils["auto-auth"].password}`);
+        }
+
+        // Start Anti-AFK if enabled
+        if (config.utils["anti-afk"].enabled) {
+            startAntiAFK(bot);
+        }
+
+        // Start Auto Chat Messages if enabled
+        if (config.utils["chat-messages"].enabled) {
+            startAutoChat(bot);
+        }
+    });
+
+    bot.on('chat', (username, message) => {
+        if (username === bot.username) return; // Ignore bot's own messages
+
+        // Auto-Responses
+        if (message.toLowerCase().includes('hello')) {
+            bot.chat(`Hello ${username}! Welcome to the server.`);
+        }
+
+        // Admin Commands
+        if (config.utils["list-admin"].adminUsers.includes(username)) {
+            if (message === "!jump") {
+                bot.chat("Jumping!");
                 bot.setControlState('jump', true);
-                setTimeout(() => bot.setControlState('jump', false), 500);
-            }, 30000); // Jumps every 30 seconds
+                setTimeout(() => bot.setControlState('jump', false), 1000);
+            }
+            if (message === "!stop") {
+                bot.chat("Stopping movement.");
+                stopAntiAFK();
+            }
+            if (message === "!coords") {
+                const { x, y, z } = bot.entity.position;
+                bot.chat(`My coordinates: X=${x.toFixed(1)} Y=${y.toFixed(1)} Z=${z.toFixed(1)}`);
+            }
         }
     });
 
     bot.on('end', () => {
-        console.log('Bot disconnected.');
-        if (config.autoReconnect) {
-            console.log('Reconnecting in 10 seconds...');
+        console.log('[BOT] Disconnected.');
+        if (config.utils.autoReconnect) {
+            console.log('[BOT] Reconnecting in 10 seconds...');
             setTimeout(createBot, 10000);
         }
     });
 
     bot.on('error', (err) => {
-        console.error('Bot error:', err);
+        console.error('[BOT] Error:', err);
     });
 }
 
-// Start the bot
+// **Anti-AFK Movement**
+let afkInterval;
+function startAntiAFK(bot) {
+    afkInterval = setInterval(() => {
+        const actions = ['jump', 'sneak', 'forward', 'back', 'left', 'right'];
+        const randomAction = actions[Math.floor(Math.random() * actions.length)];
+
+        bot.setControlState(randomAction, true);
+        setTimeout(() => bot.setControlState(randomAction, false), 1000);
+    }, 30000); // Moves every 30 seconds
+
+    if (config.utils["anti-afk"].sneak) {
+        bot.setControlState('sneak', true);
+    }
+}
+
+function stopAntiAFK() {
+    clearInterval(afkInterval);
+}
+
+// **Auto Chat Messages**
+function startAutoChat(bot) {
+    let index = 0;
+    setInterval(() => {
+        const messages = config.utils["chat-messages"].messages;
+        if (messages.length > 0) {
+            bot.chat(messages[index]);
+            index = (index + 1) % messages.length;
+        }
+    }, config.utils["chat-messages"]["repeat-delay"] * 1000);
+}
+
+// **Start the bot**
 createBot();
