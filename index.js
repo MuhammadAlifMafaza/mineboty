@@ -49,7 +49,7 @@ function createBot() {
             }
             if (message === "!stop") {
                 bot.chat("Stopping movement.");
-                stopAntiAFK();
+                stopAntiAFK(bot);
             }
             if (message === "!coords") {
                 const { x, y, z } = bot.entity.position;
@@ -60,9 +60,9 @@ function createBot() {
 
     bot.on('end', () => {
         console.log('[BOT] Disconnected.');
-        if (config.utils.autoReconnect) {
-            console.log('[BOT] Reconnecting in 10 seconds...');
-            setTimeout(createBot, 10000);
+        if (config.utils["auto-reconnect"].enabled) {
+            console.log(`[BOT] Reconnecting in ${config.utils["auto-reconnect"].delay} seconds...`);
+            setTimeout(createBot, config.utils["auto-reconnect"].delay * 1000);
         }
     });
 
@@ -80,19 +80,22 @@ function startAntiAFK(bot) {
 
         bot.setControlState(randomAction, true);
         setTimeout(() => bot.setControlState(randomAction, false), 1000);
-    }, 30000); // Moves every 30 seconds
+    }, config.utils["anti-afk"]["random-move-interval"] * 1000);
 
     if (config.utils["anti-afk"].sneak) {
         bot.setControlState('sneak', true);
     }
 }
 
-function stopAntiAFK() {
+function stopAntiAFK(bot) {
     clearInterval(afkInterval);
+    bot.setControlState('sneak', false); // Stop sneaking when AFK is disabled
 }
 
 // **Auto Chat Messages**
 function startAutoChat(bot) {
+    if (!config.utils["chat-messages"].enabled) return; // Stop if disabled
+
     let index = 0;
     setInterval(() => {
         const messages = config.utils["chat-messages"].messages;

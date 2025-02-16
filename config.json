@@ -1,14 +1,14 @@
 {
   "bot-account": {
-    "username": "RyuzakiBOTServer",
+    "username": "RyuzakiBOTserver",
     "password": ""
   },
-  
+
   "server": {
     "ip": "Ryuzaki.aternos.me",
     "port": 47477
   },
-  
+
   "position": {
     "enabled": false,
     "x": 0,
@@ -27,17 +27,17 @@
       "sneak": true,
       "random-move-interval": 30
     },
-    
+
     "chat-messages": {
       "enabled": true,
       "repeat": true,
       "repeat-delay": 300,
       "messages": [
-        "I'm a Bot Of This Server",
-        "Please Enjoy to Play this Minecraft Server!"
+        "I'm a Bot of This Server",
+        "Please enjoy playing on this Minecraft server!"
       ]
     },
-    
+
     "list-admin": {
       "enabled": true,
       "adminUsers": [
@@ -45,10 +45,11 @@
       ]
     },
 
-    "autoReconnect": {
+    "auto-reconnect": {
       "enabled": true,
       "delay": 10
     },
-    "stayAFK": true
+    
+    "stay-afk": true
   }
 }
