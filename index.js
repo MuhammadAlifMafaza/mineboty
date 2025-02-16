@@ -6,7 +6,7 @@ function createBot() {
         host: config.server,
         port: config.port,
         username: config.username,
-        password: config.password || undefined,
+        password: config.password || undefined
     });
 
     bot.on('login', () => {
@@ -16,12 +16,36 @@ function createBot() {
     bot.on('spawn', () => {
         console.log(`${bot.username} is now in the game.`);
 
-        // Prevent kicking by sending movements
-        if (config.stayAFK) {
-            setInterval(() => {
+        // Start anti-AFK movement
+        if (config.stayAFK) startAntiAFK(bot);
+    });
+
+    bot.on('chat', (username, message) => {
+        if (username === bot.username) return; // Ignore bot's own messages
+
+        // Auto-Responses
+        if (message.toLowerCase().includes('hello')) {
+            bot.chat(`Hello ${username}!`);
+        }
+        if (message.toLowerCase().includes('how are you')) {
+            bot.chat(`I'm just a bot, but I'm doing great!`);
+        }
+
+        // Admin Commands
+        if (config.adminUsers.includes(username)) {
+            if (message === "!jump") {
+                bot.chat("Jumping!");
                 bot.setControlState('jump', true);
-                setTimeout(() => bot.setControlState('jump', false), 500);
-            }, 30000); // Jumps every 30 seconds
+                setTimeout(() => bot.setControlState('jump', false), 1000);
+            }
+            if (message === "!stop") {
+                bot.chat("Stopping movement.");
+                stopAntiAFK();
+            }
+            if (message === "!coords") {
+                const { x, y, z } = bot.entity.position;
+                bot.chat(`My coordinates: X=${x.toFixed(1)} Y=${y.toFixed(1)} Z=${z.toFixed(1)}`);
+            }
         }
     });
 
@@ -36,6 +60,22 @@ function createBot() {
     bot.on('error', (err) => {
         console.error('Bot error:', err);
     });
+}
+
+// Anti-AFK Movement
+let afkInterval;
+function startAntiAFK(bot) {
+    afkInterval = setInterval(() => {
+        const actions = ['jump', 'forward', 'back', 'left', 'right'];
+        const randomAction = actions[Math.floor(Math.random() * actions.length)];
+
+        bot.setControlState(randomAction, true);
+        setTimeout(() => bot.setControlState(randomAction, false), 1000);
+    }, 30000); // Every 30 seconds
+}
+
+function stopAntiAFK() {
+    clearInterval(afkInterval);
 }
 
 // Start the bot
