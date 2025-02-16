@@ -45,11 +45,7 @@
       ]
     },
 
-    "auto-reconnect": {
-      "enabled": true,
-      "delay": 10
-    },
-
+    "auto-reconnect": true,
     "stay-afk": true
   }
 }
