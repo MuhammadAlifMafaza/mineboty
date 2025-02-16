@@ -60,9 +60,9 @@ function createBot() {
 
     bot.on('end', () => {
         console.log('[BOT] Disconnected.');
-        if (config.utils.autoReconnect) {
-            console.log('[BOT] Reconnecting in 10 seconds...');
-            setTimeout(createBot, 10000);
+        if (config.utils["auto-reconnect"].enabled) {
+            console.log(`[BOT] Reconnecting in ${config.utils["auto-reconnect"].delay} seconds...`);
+            setTimeout(createBot, config.utils["auto-reconnect"].delay * 1000);
         }
     });
 
