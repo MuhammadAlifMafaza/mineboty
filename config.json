@@ -21,10 +21,12 @@
       "enabled": true,
       "password": ""
     },
+
     "anti-afk": {
       "enabled": true,
       "sneak": true
     },
+    
     "chat-messages": {
       "enabled": true,
       "repeat": true,
@@ -34,6 +36,7 @@
         "Please Enjoy to Play this Minecraft Server!"
       ]
     },
+    
     "list-admin": {
       "adminUsers": [
         "Ryuuzagaki"
@@ -42,3 +45,5 @@
 
     "autoReconnect": true,
     "stayAFK": true
+  }
+}
