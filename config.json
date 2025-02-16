@@ -1,6 +1,6 @@
 {
   "bot-account": {
-    "username": "RyuzakiBOTserver",
+    "username": "RyuzakiBOTServer",
     "password": ""
   },
 
@@ -49,7 +49,7 @@
       "enabled": true,
       "delay": 10
     },
-    
+
     "stay-afk": true
   }
 }
