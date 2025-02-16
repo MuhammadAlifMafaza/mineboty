@@ -24,7 +24,8 @@
 
     "anti-afk": {
       "enabled": true,
-      "sneak": true
+      "sneak": true,
+      "random-move-interval": 30
     },
     
     "chat-messages": {
@@ -38,12 +39,16 @@
     },
     
     "list-admin": {
+      "enabled": true,
       "adminUsers": [
         "Ryuuzagaki"
       ]
     },
 
-    "autoReconnect": true,
+    "autoReconnect": {
+      "enabled": true,
+      "delay": 10
+    },
     "stayAFK": true
   }
 }
